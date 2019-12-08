@@ -1,0 +1,20 @@
+{
+  "name": "tscdiscord",
+  "version": "1.0.0",
+  "description": "A TypeScript Discord bot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ivan Biljan",
+  "license": "ISC",
+  "dependencies": {
+    "@types/angular": "^1.6.57",
+    "@types/node": "^12.12.14",
+    "@types/request-promise-native": "^1.0.17",
+    "discord.js": "^11.5.1",
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.8",
+    "uws": "^100.0.1"
+  }
+}
