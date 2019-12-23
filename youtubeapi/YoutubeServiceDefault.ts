@@ -191,7 +191,7 @@ export default class YoutubeServiceDefault implements Service {
             }
 
             const responseJson: YoutubeVideo[] = JSON.parse(body)['video'];
-            result = responseJson[Math.floor(Math.random() * Math.min(5, responseJson.length - 2)) + 1];
+            result = responseJson[Math.floor(Math.random() * Math.min(3, responseJson.length - 2)) + 1];
         });
 
         return result;
