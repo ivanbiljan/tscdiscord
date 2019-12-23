@@ -29,7 +29,7 @@ export class DefaultBot implements DiscordBot {
                 return;
             }
 
-            msg.channel.bulkDelete(numberOfMessages);
+            msg.channel.bulkDelete(numberOfMessages + 1);
         }
     };
 
