@@ -3,5 +3,5 @@
     "commandPrefix": "!",
     "canPlayMusic": true,
     "musicVoiceChannel": "650717222066454552",
-    "aliases": []
+    "aliases": ["matic"]
 }

@@ -21,7 +21,7 @@ var DefaultBot = /** @class */ (function () {
                     msg.channel.send('Invalid number specified');
                     return;
                 }
-                msg.channel.bulkDelete(numberOfMessages);
+                msg.channel.bulkDelete(numberOfMessages + 1);
             },
             _a);
         this.client = new Discord.Client();
@@ -44,15 +44,26 @@ var DefaultBot = /** @class */ (function () {
             console.log("> CHeeRs FRoM CROatTia");
         });
         this.client.on('message', function (msg) {
+            var indexOfSpace = msg.content.indexOf(' ');
             if (msg.content.startsWith(_this.configFile.commandPrefix)) {
-                var indexOfSpace = msg.content.indexOf(' ');
                 if (indexOfSpace == -1) {
                     indexOfSpace = msg.content.length; // The command does not take any arguments
                 }
                 var commandName = msg.content.substring(1, indexOfSpace);
                 var callback = _this.commands[commandName];
                 if (callback) {
-                    callback(msg, msg.content.slice(indexOfSpace + 1));
+                    callback(msg, msg.content.slice(indexOfSpace).trim());
+                }
+            }
+            else if (_this.configFile.aliases.includes(msg.content.substring(0, indexOfSpace))) {
+                console.log('true');
+                var input = msg.content.slice(indexOfSpace).trim();
+                var commandName = input.substring(0, input.indexOf(' ') == -1 ? input.length : input.indexOf(' '));
+                console.log(input);
+                console.log(commandName);
+                var callback = _this.commands[commandName];
+                if (callback) {
+                    callback(msg, msg.content.slice(indexOfSpace).trim());
                 }
             }
         });

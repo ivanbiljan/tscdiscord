@@ -58,8 +58,8 @@ export class DefaultBot implements DiscordBot {
         });
 
         this.client.on('message', msg => {
+            let indexOfSpace = msg.content.indexOf(' ');
             if (msg.content.startsWith(this.configFile.commandPrefix)) {
-                let indexOfSpace = msg.content.indexOf(' ');
                 if (indexOfSpace == -1) {
                     indexOfSpace = msg.content.length; // The command does not take any arguments
                 }
@@ -67,7 +67,17 @@ export class DefaultBot implements DiscordBot {
                 const commandName = msg.content.substring(1, indexOfSpace);
                 const callback = this.commands[commandName];
                 if (callback) {
-                    callback(msg, msg.content.slice(indexOfSpace + 1));
+                    callback(msg, msg.content.slice(indexOfSpace).trim());
+                }
+            } else if (this.configFile.aliases.includes(msg.content.substring(0, indexOfSpace))) {
+                console.log('true');
+                const input = msg.content.slice(indexOfSpace).trim();
+                const commandName = input.substring(0, input.indexOf(' ') == -1 ? input.length : input.indexOf(' '));
+                console.log(input);
+                console.log(commandName);
+                const callback = this.commands[commandName];
+                if (callback) {
+                    callback(msg, msg.content.slice(indexOfSpace).trim());
                 }
             }
         });
