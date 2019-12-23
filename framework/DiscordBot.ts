@@ -16,11 +16,14 @@ export class DefaultBot implements DiscordBot {
         new YoutubeServiceDefault()
     ];
 
-    private commands: { [cmd: string]: (msg: Discord.Message) => any } = {
+    private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
         ['ping']: (msg: Discord.Message) => msg.channel.send('ponGG'),
         ['nick']: (msg: Discord.Message) => {
             let nick = msg.content.substring(msg.content.indexOf(' ') + 1);
             msg.guild.members.get(this.client.user.id)!.setNickname(nick);
+        },
+        ['purge']: (msg: Discord.Message, args: string) => {
+            let numberOfMessages = +args
         }
     };
 
@@ -30,13 +33,12 @@ export class DefaultBot implements DiscordBot {
 
     constructor(configFile: ConfigurationFile, services?: Service[]) {
         this.configFile = configFile;
-        if (services == undefined) {
+        this.loadedServices = services || this.services;
+        /*if (services == undefined) {
             this.loadedServices = this.services;
         } else {
             this.loadedServices = services;
-        }
-
-        console.log(this.loadedServices.length);
+        }*/
     }
 
     connect(): void {
@@ -46,7 +48,7 @@ export class DefaultBot implements DiscordBot {
         });
 
         this.client.on('ready', () => {
-            console.log("CHeeRs FRoM CROatTia");
+            console.log("> CHeeRs FRoM CROatTia");
         });
 
         this.client.on('message', msg => {
@@ -59,13 +61,13 @@ export class DefaultBot implements DiscordBot {
                 const commandName = msg.content.substring(1, indexOfSpace);
                 const callback = this.commands[commandName];
                 if (callback) {
-                    callback(msg);
+                    callback(msg, msg.content.slice(indexOfSpace + 1));
                 }
             }
         });
     }
 
-    registerCommand(commandName: string, callback: (msg: Discord.Message) => void) {
+    registerCommand(commandName: string, callback: (msg: Discord.Message, args: string) => void) {
         this.commands[commandName] = callback;
     }
 }

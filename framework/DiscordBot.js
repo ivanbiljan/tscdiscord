@@ -15,17 +15,19 @@ var DefaultBot = /** @class */ (function () {
                 var nick = msg.content.substring(msg.content.indexOf(' ') + 1);
                 msg.guild.members.get(_this.client.user.id).setNickname(nick);
             },
+            _a['purge'] = function (msg, args) {
+                var numberOfMessages = +args;
+            },
             _a);
         this.client = new Discord.Client();
         this.loadedServices = [];
         this.configFile = configFile;
-        if (services == undefined) {
+        this.loadedServices = services || this.services;
+        /*if (services == undefined) {
             this.loadedServices = this.services;
-        }
-        else {
+        } else {
             this.loadedServices = services;
-        }
-        console.log(this.loadedServices.length);
+        }*/
     }
     DefaultBot.prototype.connect = function () {
         var _this = this;
@@ -34,7 +36,7 @@ var DefaultBot = /** @class */ (function () {
             service.initialize(_this);
         });
         this.client.on('ready', function () {
-            console.log("CHeeRs FRoM CROatTia");
+            console.log("> CHeeRs FRoM CROatTia");
         });
         this.client.on('message', function (msg) {
             if (msg.content.startsWith(_this.configFile.commandPrefix)) {
@@ -45,7 +47,7 @@ var DefaultBot = /** @class */ (function () {
                 var commandName = msg.content.substring(1, indexOfSpace);
                 var callback = _this.commands[commandName];
                 if (callback) {
-                    callback(msg);
+                    callback(msg, msg.content.slice(indexOfSpace + 1));
                 }
             }
         });
