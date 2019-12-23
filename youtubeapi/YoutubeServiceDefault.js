@@ -36,20 +36,29 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var discord_js_1 = require("discord.js");
 var request = require("request-promise-native");
 var Streams = require("stream");
 var parser = require('partial-json-parser');
 var BeautifulDom = require('beautiful-dom');
 var ytdlcore = require('ytdl-core');
 // TODO: Figure out what's wrong with deciphering and get rid of the ytdl-core dependency
+var MusicQueue = /** @class */ (function () {
+    function MusicQueue() {
+        this.songs = [];
+        this.connection = undefined;
+    }
+    return MusicQueue;
+}());
 var YoutubeServiceDefault = /** @class */ (function () {
     function YoutubeServiceDefault() {
         this.videoLinkRegex = new RegExp('(?:https?:\/\/)?(?:www\.)?youtu(?:(\.be\/(?<videoId>.*))|(be\.com\/(?:(watch\?v=|v\/)(?<videoId2>.*))))');
+        this.musicQueue = new MusicQueue();
     }
     YoutubeServiceDefault.prototype.initialize = function (bot) {
         var _this = this;
         bot.registerCommand('play', function (msg, args) { return __awaiter(_this, void 0, void 0, function () {
-            var voiceConnection, video;
+            var video, voiceConnection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -69,31 +78,69 @@ var YoutubeServiceDefault = /** @class */ (function () {
                             msg.channel.send('No arguments provided');
                             return [2 /*return*/];
                         }
-                        return [4 /*yield*/, msg.member.voiceChannel.join()];
-                    case 1:
-                        voiceConnection = _a.sent();
                         return [4 /*yield*/, this.getVideoByName(args)];
-                    case 2:
+                    case 1:
                         video = _a.sent();
                         if (video == undefined) {
                             msg.channel.send("No results found for query '" + args + "'");
                             return [2 /*return*/];
                         }
-                        console.log(video);
-                        voiceConnection.playStream(ytdlcore("https://youtube.com/watch/?v=" + video.encrypted_id));
-                        msg.channel.send("Playing '" + video.title + "'");
-                        return [2 /*return*/];
+                        if (!!this.musicQueue.connection) return [3 /*break*/, 3];
+                        return [4 /*yield*/, msg.member.voiceChannel.join()];
+                    case 2:
+                        voiceConnection = _a.sent();
+                        this.musicQueue.connection = voiceConnection;
+                        this.musicQueue.songs.push(video);
+                        this.playNextSong(msg);
+                        return [3 /*break*/, 4];
+                    case 3:
+                        this.musicQueue.songs.push(video);
+                        msg.channel.send("'" + video.title + "' has been added to the song queue");
+                        _a.label = 4;
+                    case 4: return [2 /*return*/];
                 }
             });
         }); });
+        bot.registerCommand('skip', function (msg) {
+            msg.channel.send('Skipping current song...');
+            _this.playNextSong(msg);
+        });
         bot.registerCommand('musicchannel', function (msg, args) {
-            if (!args) {
-                msg.channel.send('No arguments provided');
+            if (!+args) {
+                msg.channel.send('Invalid arguments');
                 return;
             }
             bot.configFile.musicVoiceChannel = args;
             msg.channel.send("Voice channel set to #" + args);
         });
+    };
+    YoutubeServiceDefault.prototype.playNextSong = function (msg) {
+        var _this = this;
+        if (!this.musicQueue.connection) { // This should probably never happen
+            return;
+        }
+        if (this.musicQueue.songs.length == 0) {
+            this.musicQueue.connection.disconnect();
+            this.musicQueue.connection = undefined;
+            return;
+        }
+        var song = this.musicQueue.songs.shift();
+        this.musicQueue.connection.playStream(ytdlcore("https://youtube.com/watch?v=" + song.encrypted_id)).on('end', function () {
+            _this.playNextSong(msg);
+        });
+        var embed = new discord_js_1.RichEmbed()
+            .setColor('0099ff')
+            .setAuthor('Now Playing', 'https://i.imgur.com/FpwHmmL.png')
+            .setTitle(song.title)
+            .setDescription(unescape(song.description))
+            .setThumbnail('https://github.com/remojansen/logo.ts/raw/master/ts.png')
+            .addBlankField()
+            .addField('Uploaded by:', song.author, true)
+            .addField('Views:', song.views, true)
+            .setImage(song.thumbnail)
+            .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
+            .setTimestamp();
+        msg.channel.send(embed);
     };
     YoutubeServiceDefault.prototype.getVideoById = function (value) {
         return __awaiter(this, void 0, void 0, function () {
@@ -208,7 +255,7 @@ var YoutubeServiceDefault = /** @class */ (function () {
                                     console.error("yt: unsuccessful response (" + res.statusCode + ")");
                                 }
                                 var responseJson = JSON.parse(body)['video'];
-                                result = responseJson[Math.floor(Math.random() * (responseJson.length - 2)) + 1];
+                                result = responseJson[Math.floor(Math.random() * Math.min(5, responseJson.length - 2)) + 1];
                             })];
                     case 1:
                         _a.sent();

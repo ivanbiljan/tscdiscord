@@ -24,6 +24,12 @@ export class DefaultBot implements DiscordBot {
         },
         ['purge']: (msg: Discord.Message, args: string) => {
             let numberOfMessages = +args
+            if (!numberOfMessages) {
+                msg.channel.send('Invalid number specified');
+                return;
+            }
+
+            msg.channel.bulkDelete(numberOfMessages);
         }
     };
 

@@ -17,6 +17,11 @@ var DefaultBot = /** @class */ (function () {
             },
             _a['purge'] = function (msg, args) {
                 var numberOfMessages = +args;
+                if (!numberOfMessages) {
+                    msg.channel.send('Invalid number specified');
+                    return;
+                }
+                msg.channel.bulkDelete(numberOfMessages);
             },
             _a);
         this.client = new Discord.Client();

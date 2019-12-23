@@ -1,6 +1,6 @@
 import { Service } from '../framework/Service';
 import { DefaultBot } from '../framework/DiscordBot';
-import { Message, MessageEmbedField } from 'discord.js';
+import { Message, MessageEmbedField, RichEmbed, VoiceConnection } from 'discord.js';
 import { stringify } from 'querystring';
 import * as request from 'request-promise-native';
 import { YoutubeVideo } from './YoutubeVideo';
@@ -19,8 +19,14 @@ const ytdlcore = require('ytdl-core');
 
 // TODO: Figure out what's wrong with deciphering and get rid of the ytdl-core dependency
 
+class MusicQueue {
+    songs: YoutubeVideo[] = [];
+    connection: VoiceConnection | undefined = undefined;
+}
+
 export default class YoutubeServiceDefault implements Service {
-    private videoLinkRegex = new RegExp('(?:https?:\/\/)?(?:www\.)?youtu(?:(\.be\/(?<videoId>.*))|(be\.com\/(?:(watch\?v=|v\/)(?<videoId2>.*))))');
+    private readonly videoLinkRegex = new RegExp('(?:https?:\/\/)?(?:www\.)?youtu(?:(\.be\/(?<videoId>.*))|(be\.com\/(?:(watch\?v=|v\/)(?<videoId2>.*))))');
+    private readonly musicQueue = new MusicQueue();
 
     initialize(bot: DefaultBot) {
         bot.registerCommand('play', async (msg: Message, args: string) => {
@@ -44,27 +50,68 @@ export default class YoutubeServiceDefault implements Service {
                 return;
             }
 
-            const voiceConnection = await msg.member.voiceChannel.join();
             const video = await this.getVideoByName(args);
             if (video == undefined) {
                 msg.channel.send(`No results found for query '${args}'`);
                 return;
             }
 
-            console.log(video);
-            voiceConnection.playStream(ytdlcore(`https://youtube.com/watch/?v=${video.encrypted_id}`));
-            msg.channel.send(`Playing '${video.title}'`);
+            if (!this.musicQueue.connection) {
+                const voiceConnection = await msg.member.voiceChannel.join();
+                this.musicQueue.connection = voiceConnection;
+                this.musicQueue.songs.push(video);
+                this.playNextSong(msg);
+            } else {
+                this.musicQueue.songs.push(video);
+                msg.channel.send(`'${video.title}' has been added to the song queue`);
+            }
+        });
+
+        bot.registerCommand('skip', (msg: Message) => {
+            msg.channel.send('Skipping current song...');
+            this.playNextSong(msg);
         });
 
         bot.registerCommand('musicchannel', (msg: Message, args: string) => {
-            if (!args) {
-                msg.channel.send('No arguments provided');
+            if (!+args) {
+                msg.channel.send('Invalid arguments');
                 return;
             }
 
             bot.configFile.musicVoiceChannel = args;
             msg.channel.send(`Voice channel set to #${args}`);
         });
+    }
+
+    private playNextSong(msg: Message): void {
+        if (!this.musicQueue.connection) { // This should probably never happen
+            return;
+        }
+
+        if (this.musicQueue.songs.length == 0) {
+            this.musicQueue.connection.disconnect();
+            this.musicQueue.connection = undefined;
+            return;
+        }
+
+        const song = this.musicQueue.songs.shift()!;
+        this.musicQueue.connection.playStream(ytdlcore(`https://youtube.com/watch?v=${song.encrypted_id}`)).on('end', () => {
+            this.playNextSong(msg);
+        });
+
+        const embed = new RichEmbed()
+            .setColor('0099ff')
+            .setAuthor('Now Playing', 'https://i.imgur.com/FpwHmmL.png')
+            .setTitle(song.title)
+            .setDescription(unescape(song.description))
+            .setThumbnail('https://github.com/remojansen/logo.ts/raw/master/ts.png')
+            .addBlankField()
+            .addField('Uploaded by:', song.author, true)
+            .addField('Views:', song.views, true)
+            .setImage(song.thumbnail)
+            .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
+            .setTimestamp();
+        msg.channel.send(embed);
     }
 
     async getVideoById(value: string): Promise<YoutubeVideo> {
@@ -144,7 +191,7 @@ export default class YoutubeServiceDefault implements Service {
             }
 
             const responseJson: YoutubeVideo[] = JSON.parse(body)['video'];
-            result = responseJson[Math.floor(Math.random() * (responseJson.length - 2)) + 1];
+            result = responseJson[Math.floor(Math.random() * Math.min(5, responseJson.length - 2)) + 1];
         });
 
         return result;

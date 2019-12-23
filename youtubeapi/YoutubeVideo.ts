@@ -1,10 +1,12 @@
 import { AdaptiveStream } from "./AdaptiveStream";
 
 export interface YoutubeVideo {
+    thumbnail: string;
     encrypted_id: string;
     author: string;
     title: string;
-    viewCount: string;
+    description: string;
+    views: string;
     dateAdded: string;
     likeCount: number;
     dislikeCount: number;
