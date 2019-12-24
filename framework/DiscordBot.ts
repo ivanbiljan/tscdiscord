@@ -4,6 +4,9 @@ import { ConfigurationFile } from '../config/ConfigurationFile';
 import * as fs from 'fs';
 import * as path from 'path';
 import YoutubeServiceDefault from '../youtubeapi/YoutubeServiceDefault';
+import InstagramService from '../instagram/InstagramService';
+
+// TODO: Come up with a proper service detection mechanism
 
 export interface DiscordBot {
     client: Discord.Client;
@@ -13,7 +16,8 @@ export interface DiscordBot {
 
 export class DefaultBot implements DiscordBot {
     private services: Service[] = [
-        new YoutubeServiceDefault()
+        new YoutubeServiceDefault(),
+        new InstagramService()
     ];
 
     private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {

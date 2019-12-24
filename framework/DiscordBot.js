@@ -2,12 +2,14 @@
 exports.__esModule = true;
 var Discord = require("discord.js");
 var YoutubeServiceDefault_1 = require("../youtubeapi/YoutubeServiceDefault");
+var InstagramService_1 = require("../instagram/InstagramService");
 var DefaultBot = /** @class */ (function () {
     function DefaultBot(configFile, services) {
         var _a;
         var _this = this;
         this.services = [
-            new YoutubeServiceDefault_1["default"]()
+            new YoutubeServiceDefault_1["default"](),
+            new InstagramService_1["default"]()
         ];
         this.commands = (_a = {},
             _a['ping'] = function (msg) { return msg.channel.send('ponGG'); },
