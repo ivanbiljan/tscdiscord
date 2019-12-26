@@ -1,12 +1,19 @@
+dist: trusty
+sudo: required
+
 language: node_js
 
 node_js:
   - 'node'
   - '10'
 
+serivces:
+  - redis-server
+
 before_script:
+  - npm install -g typescript
   - npm install
   - npm run build
 
 script:
-  - npm run test
+  - npm run app
