@@ -1,8 +1,8 @@
 {
-    "token": "NjUwNzE5NjM4ODQ1NjUzMDEy.XeUsAA.Bj7V7lK2_0VaHRINpvtau4dvDKE",
+    "token": "",
     "serpApiKey": "",
-    "commandPrefix": "!",
+    "commandPrefix": "",
     "canPlayMusic": true,
-    "musicVoiceChannel": "650717222066454552",
-    "aliases": ["matic"]
+    "musicVoiceChannel": "",
+    "aliases": []
 }
