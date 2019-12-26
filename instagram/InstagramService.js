@@ -37,18 +37,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var request = require("request-promise-native");
+var discord_js_1 = require("discord.js");
 var Utils_1 = require("../Utils");
 var InstagramService = /** @class */ (function () {
     function InstagramService() {
     }
     InstagramService.prototype.initialize = function (bot) {
-        /*let result = {} as any;
-        request.get('https://instagram.com/croatiart/?__a=1', (err, res, body) => {
-            let result: ResponseData.ResponseJson = JSON.parse(body);
-            console.log(result.graphql.user.edge_owner_to_timeline_media);
-            console.log(result.graphql.user.edge_owner_to_timeline_media.edges[0].node.display_url);
-        }).then(() => {
-        });*/
         var _this = this;
         bot.registerCommand('gomazbomb', function (msg, args) { return __awaiter(_this, void 0, void 0, function () {
             var timelineMedia;
@@ -62,9 +56,34 @@ var InstagramService = /** @class */ (function () {
                 }
             });
         }); });
-        bot.registerCommand('overview', function (msg, args) { return __awaiter(_this, void 0, void 0, function () {
+        bot.registerCommand('insta', function (msg, args) { return __awaiter(_this, void 0, void 0, function () {
+            var data, embed;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0:
+                        if (!args || !/\S/g.test(args)) {
+                            msg.channel.send('Invalid arguments');
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, this.fetchData(args)];
+                    case 1:
+                        data = _a.sent();
+                        embed = new discord_js_1.RichEmbed()
+                            .setColor('0099ff')
+                            .setAuthor('Overview', 'https://i.imgur.com/M6yBwxS.png?1')
+                            .setTitle("@" + data.graphql.user.username)
+                            .setURL("https://instagram.com/" + data.graphql.user.username)
+                            .setDescription(data.graphql.user.full_name)
+                            .setThumbnail('https://github.com/remojansen/logo.ts/raw/master/ts.png')
+                            .addField('Posts:', data.graphql.user.edge_owner_to_timeline_media.count, true)
+                            .addField('Followers:', data.graphql.user.edge_followed_by.count, true)
+                            .addField('Following:', data.graphql.user.edge_follow.count, true)
+                            .setImage(data.graphql.user.profile_pic_url_hd)
+                            .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
+                            .setTimestamp();
+                        msg.channel.send(embed);
+                        return [2 /*return*/];
+                }
             });
         }); });
     };
@@ -75,7 +94,7 @@ var InstagramService = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         response = {};
-                        return [4 /*yield*/, request.get("https://instagram.com/croatiart/?__a=1", function (err, res, body) {
+                        return [4 /*yield*/, request.get("https://instagram.com/" + profile + "/?__a=1", function (err, res, body) {
                                 if (err) {
                                     console.log("An error has occured while fetching timeline data: " + err);
                                 }

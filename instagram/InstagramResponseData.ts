@@ -10,7 +10,11 @@ export interface InstagramUser {
     biography: string;
     full_name: string;
     username: string;
+    is_verified: boolean;
+    profile_pic_url_hd: string;
     edge_owner_to_timeline_media: TimelineMedia;
+    edge_followed_by: {count: number};
+    edge_follow: {count: number};
 }
 
 export interface TimelineMedia {

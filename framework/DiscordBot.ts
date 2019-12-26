@@ -1,12 +1,14 @@
 import * as Discord from 'discord.js';
 import { Service } from '../framework/Service';
 import { ConfigurationFile } from '../config/ConfigurationFile';
-import * as fs from 'fs';
-import * as path from 'path';
 import YoutubeServiceDefault from '../youtubeapi/YoutubeServiceDefault';
 import InstagramService from '../instagram/InstagramService';
+import GoogleService from '../google/GoogleService';
+import redis = require('redis');
+import QuoteService from '../quotes/QuoteService';
 
 // TODO: Come up with a proper service detection mechanism
+//       Regex matching for commands
 
 export interface DiscordBot {
     client: Discord.Client;
@@ -15,9 +17,18 @@ export interface DiscordBot {
 }
 
 export class DefaultBot implements DiscordBot {
+    private redisOptions: redis.ClientOpts = {
+        host: '127.0.0.1',
+        port: 6379
+    };
+    
+    private redisclient: redis.RedisClient | undefined;
+
     private services: Service[] = [
         new YoutubeServiceDefault(),
-        new InstagramService()
+        new InstagramService(),
+        new GoogleService(),
+        new QuoteService()
     ];
 
     private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
@@ -44,50 +55,72 @@ export class DefaultBot implements DiscordBot {
     constructor(configFile: ConfigurationFile, services?: Service[]) {
         this.configFile = configFile;
         this.loadedServices = services || this.services;
-        /*if (services == undefined) {
-            this.loadedServices = this.services;
-        } else {
-            this.loadedServices = services;
-        }*/
     }
 
     connect(): void {
         this.client.login(this.configFile.token);
-        this.loadedServices.forEach(service => {
-            service.initialize(this);
-        });
-
         this.client.on('ready', () => {
             console.log("> CHeeRs FRoM CROatTia");
         });
 
         this.client.on('message', msg => {
+            let commandName = '';
             let indexOfSpace = msg.content.indexOf(' ');
             if (msg.content.startsWith(this.configFile.commandPrefix)) {
                 if (indexOfSpace == -1) {
                     indexOfSpace = msg.content.length; // The command does not take any arguments
                 }
 
-                const commandName = msg.content.substring(1, indexOfSpace);
-                const callback = this.commands[commandName];
-                if (callback) {
-                    callback(msg, msg.content.slice(indexOfSpace).trim());
-                }
+                commandName = msg.content.substring(1, indexOfSpace);
             } else if (this.configFile.aliases.includes(msg.content.substring(0, indexOfSpace))) {
-                console.log('true');
                 const input = msg.content.slice(indexOfSpace).trim();
-                const commandName = input.substring(0, input.indexOf(' ') == -1 ? input.length : input.indexOf(' '));
-                console.log(input);
-                console.log(commandName);
-                const callback = this.commands[commandName];
-                if (callback) {
-                    callback(msg, msg.content.slice(indexOfSpace).trim());
-                }
+                indexOfSpace = input.indexOf(' ');
+                commandName = input.substring(0, indexOfSpace == -1 ? input.length : indexOfSpace);
+            } else {
+                // Handle regex matching
             }
+
+            if (!commandName) {
+                return;
+            }
+
+            const callback = this.commands[commandName];
+            if (callback) {
+                callback(msg, msg.content.slice(indexOfSpace).trim());
+            }
+        });
+
+        this.redisclient = redis.createClient(this.redisOptions).on('connect', () => {
+            this.loadedServices.forEach(service => {
+                service.initialize(this);
+            });
         });
     }
 
-    registerCommand(commandName: string, callback: (msg: Discord.Message, args: string) => void) {
+    registerCommand(commandName: string, callback: (msg: Discord.Message, args: string) => void): void {
         this.commands[commandName] = callback;
+    }
+
+    redisSave(key: string, value: any): void {
+        if (!this.redisclient) {
+            return;
+        }
+
+        this.redisclient.set(key, JSON.stringify(value));
+        this.redisclient.save();
+    }
+
+    redisLoad<T>(key: string, callback: (err: Error | null, val: T) => any): void {
+        if (this.redisclient == undefined || !this.redisclient.connected) {
+            return undefined;
+        }
+
+        this.redisclient.get(key, (err, val) => {
+            if (err) {
+                console.log(`redis: ${err}`);
+            }
+
+            return callback(err, JSON.parse(val));
+        });
     }
 }
