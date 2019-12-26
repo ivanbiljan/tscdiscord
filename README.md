@@ -38,4 +38,5 @@ Register a new bot at https://discordapp.com/developers. Once done, open `My App
 Open `My Application` -> `General Information`. Copy the bot's client ID and paste it into the following URL: https://discordapp.com/api/oauth2/authorize?client_id=[CLIENT_ID]&scope=bot&permissions=[PERMISSIONS]
 
 ## Run the application
-Run `tsc` followed by `node dist/main.js`
+Run `npm setup`
+Run `npm run app`
