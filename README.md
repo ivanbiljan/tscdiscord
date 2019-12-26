@@ -1,4 +1,6 @@
 # tscdiscord
+[![Build Status](https://travis-ci.com/ivanbiljan/tscdiscord.svg?token=rvj6EvJ5BXdebUHHysAV&branch=master)](https://travis-ci.com/ivanbiljan/tscdiscord) [![GitHub license](https://img.shields.io/github/license/ivanbiljan/tscdiscord.svg)](https://github.com/ivanbiljan/tscdiscord/blob/master/LICENSE) [![IssuesOpen](https://img.shields.io/github/issues/ivanbiljan/tscdiscord.svg)](https://img.shields.io/github/issues/ivanbiljan/tscdiscord) [![PullRequests](https://img.shields.io/github/issues-pr/ivanbiljan/tscdiscord.svg)](https://img.shields.io/github/issues-pr/ivanbiljan/tscdiscord)
+
 [tscdiscord](https://github.com/ivanbiljan/tscdiscord) is a multi-purpose Discord chat bot built on top of the [discord.js](https://github.com/discordjs/discord.js) framework using TypeScript.
 
 ## Features
@@ -38,5 +40,4 @@ Register a new bot at https://discordapp.com/developers. Once done, open `My App
 Open `My Application` -> `General Information`. Copy the bot's client ID and paste it into the following URL: https://discordapp.com/api/oauth2/authorize?client_id=[CLIENT_ID]&scope=bot&permissions=[PERMISSIONS]
 
 ## Run the application
-Run `npm setup`
-Run `npm run app`
+Run `npm install` followed by `npm run build` and `npm run app`
