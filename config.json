@@ -1,0 +1,8 @@
+{
+    "token": "",
+    "serpApiKey": "",
+    "commandPrefix": "!",
+    "canPlayMusic": true,
+    "musicVoiceChannel": "",
+    "aliases": []
+}
