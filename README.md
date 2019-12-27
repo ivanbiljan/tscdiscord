@@ -1,5 +1,5 @@
 # tscdiscord
-[![Build Status](https://travis-ci.com/ivanbiljan/tscdiscord.svg?token=rvj6EvJ5BXdebUHHysAV&branch=master)](https://travis-ci.com/ivanbiljan/tscdiscord) [![GitHub license](https://img.shields.io/github/license/ivanbiljan/tscdiscord.svg)](https://github.com/ivanbiljan/tscdiscord/blob/master/LICENSE) [![IssuesOpen](https://img.shields.io/github/issues/ivanbiljan/tscdiscord.svg)](https://img.shields.io/github/issues/ivanbiljan/tscdiscord) [![PullRequests](https://img.shields.io/github/issues-pr/ivanbiljan/tscdiscord.svg)](https://img.shields.io/github/issues-pr/ivanbiljan/tscdiscord)
+[![Build Status](https://travis-ci.com/ivanbiljan/tscdiscord.svg?token=rvj6EvJ5BXdebUHHysAV&branch=master)](https://travis-ci.com/ivanbiljan/tscdiscord) [![GitHub license](https://img.shields.io/github/license/ivanbiljan/tscdiscord.svg)](https://github.com/ivanbiljan/tscdiscord/blob/master/LICENSE) [![IssuesOpen](https://img.shields.io/github/issues/ivanbiljan/tscdiscord.svg)](https:github.com/ivanbiljan/tscdiscord/issues) [![PullRequests](https://img.shields.io/github/issues-pr/ivanbiljan/tscdiscord.svg)](https:github.com/ivanbiljan/tscdiscord/pulls)
 
 [tscdiscord](https://github.com/ivanbiljan/tscdiscord) is a multi-purpose Discord chat bot built on top of the [discord.js](https://github.com/discordjs/discord.js) framework using TypeScript.
 
