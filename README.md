@@ -7,19 +7,19 @@
 * Quote system
 * Instagram service
 * YouTube API which allows playing music via Discord voice chat (does not require a Google API key)
-* Forecasts (TODO)
+* Forecasts (current, weekly)
+* Game tracking (CSGO, Fortnite, Apex)
 * Google search (TODO)
 * Google image scraping (TODO)
-* Forecasting
-* Game tracking (CSGO, Fortnite, Apex)
 * Reminders (TODO)
 * Highlights (TODO)
 
 ## Prerequisites
 * Node.js 10.2.0 or higher
 * node-gyp
-* Python v2.7
+* Python v2.7 or higher
 * ffmpeg
+* Redis
 
 ## Installation
 * Configure TypeScript if necessary: `npm install [-g] typescript`
@@ -35,7 +35,14 @@
     sudo apt-get update
     sudo apt-get install ffmpeg
     ```
-    
+* Install `redis-server`:
+  * On **Windows 10**:
+      - Pick a release from [Redis' release page](http://download.redis.io/releases/)
+      - Unpack the file and run the setup
+  * On **(WSL) Ubuntu**:
+    ```console
+    sudo apt-get install redis-server
+    ```
 ## Discord setup
 Register a new bot at https://discordapp.com/developers. Once done, open `My Application` -> `Bot`, get the bot's token and paste it into `config.json`.
 
@@ -43,3 +50,6 @@ Open `My Application` -> `General Information`. Copy the bot's client ID and pas
 
 ## Run the application
 Run `npm install` followed by `npm run build` and `npm run app`
+
+## License
+This project is distributed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License), see [LICENSE](https://github.com/ivanbiljan/tscdiscord/blob/master/LICENSE) for more details.
