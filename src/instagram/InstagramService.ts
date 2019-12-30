@@ -20,23 +20,23 @@ export default class InstagramService implements Service {
 
             const data = await this.fetchData(args);
             const embed = new RichEmbed()
-            .setColor('0099ff')
-            .setAuthor('Overview', 'https://i.imgur.com/M6yBwxS.png?1')
-            .setTitle(`@${data.graphql.user.username}`)
-            .setURL(`https://instagram.com/${data.graphql.user.username}`)
-            .setDescription(data.graphql.user.full_name)
-            .setThumbnail('https://github.com/remojansen/logo.ts/raw/master/ts.png')
-            .addField('Posts:', data.graphql.user.edge_owner_to_timeline_media.count, true)
-            .addField('Followers:', data.graphql.user.edge_followed_by.count, true)
-            .addField('Following:', data.graphql.user.edge_follow.count, true)
-            .setImage(data.graphql.user.profile_pic_url_hd)
-            .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
-            .setTimestamp();
+                .setColor('0099ff')
+                .setAuthor('Overview', 'https://i.imgur.com/M6yBwxS.png?1')
+                .setTitle(`@${data.graphql.user.username}`)
+                .setURL(`https://instagram.com/${data.graphql.user.username}`)
+                .setDescription(data.graphql.user.full_name)
+                .setThumbnail('https://github.com/remojansen/logo.ts/raw/master/ts.png')
+                .addField('Posts:', data.graphql.user.edge_owner_to_timeline_media.count, true)
+                .addField('Followers:', data.graphql.user.edge_followed_by.count, true)
+                .addField('Following:', data.graphql.user.edge_follow.count, true)
+                .setImage(data.graphql.user.profile_pic_url_hd)
+                .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
+                .setTimestamp();
             msg.channel.send(embed);
         });
     }
 
-    private async fetchData(profile: string): Promise<ResponseData.ResponseJson> {
+    public async fetchData(profile: string): Promise<ResponseData.ResponseJson> {
         let response = {} as ResponseData.ResponseJson;
         await request.get(`https://instagram.com/${profile}/?__a=1`, (err, res, body) => {
             if (err) {

@@ -6,6 +6,7 @@ import InstagramService from '../instagram/InstagramService';
 import GoogleService from '../google/GoogleService';
 import redis = require('redis');
 import QuoteService from '../quotes/QuoteService';
+import ApexTrackerService from '../gametrackers/apex/ApexTrackerService';
 
 // TODO: Come up with a proper service detection mechanism
 //       Regex matching for commands
@@ -28,7 +29,8 @@ export class DefaultBot implements DiscordBot {
         new YoutubeServiceDefault(),
         new InstagramService(),
         new GoogleService(),
-        new QuoteService()
+        new QuoteService(),
+        new ApexTrackerService()
     ];
 
     private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
