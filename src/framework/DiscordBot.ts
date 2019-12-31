@@ -8,6 +8,7 @@ import redis = require('redis');
 import QuoteService from '../quotes/QuoteService';
 import ApexTrackerService from '../gametrackers/apex/ApexTrackerService';
 import { Command } from './Command';
+import ReminderService from '../reminders/ReminderService';
 
 // TODO: Come up with a proper service detection mechanism
 //       Regex matching for commands
@@ -31,7 +32,8 @@ export class DefaultBot implements DiscordBot {
         new InstagramService(),
         new GoogleService(),
         new QuoteService(),
-        new ApexTrackerService()
+        new ApexTrackerService(),
+        new ReminderService()
     ];
 
     /*private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
@@ -49,7 +51,6 @@ export class DefaultBot implements DiscordBot {
 
             msg.channel.bulkDelete(numberOfMessages + 1);
         }
-        [/\S/g.toString()]: 
     };*/
     private commands: Command[] = [];
 
@@ -91,30 +92,6 @@ export class DefaultBot implements DiscordBot {
                     this.commands[i].callback(msg, match);
                 }
             }
-            /*let commandName = '';
-            let indexOfSpace = msg.content.indexOf(' ');
-            if (msg.content.startsWith(this.configFile.commandPrefix)) {
-                if (indexOfSpace == -1) {
-                    indexOfSpace = msg.content.length; // The command does not take any arguments
-                }
-
-                commandName = msg.content.substring(1, indexOfSpace);
-            } else if (this.configFile.aliases.includes(msg.content.substring(0, indexOfSpace))) {
-                const input = msg.content.slice(indexOfSpace).trim();
-                indexOfSpace = input.indexOf(' ');
-                commandName = input.substring(0, indexOfSpace == -1 ? input.length : indexOfSpace);
-            } else {
-                // Handle regex matching
-            }
-
-            if (!commandName) {
-                return;
-            }
-
-            const callback = this.commands[commandName];
-            if (callback) {
-                callback(msg, msg.content.slice(indexOfSpace).trim());
-            }*/
         });
 
         this.redisclient = redis.createClient(this.redisOptions).on('connect', () => {
@@ -124,6 +101,7 @@ export class DefaultBot implements DiscordBot {
         });
 
         this.registerCommand('ping', (msg: Discord.Message) => msg.channel.send('ponGG'));
+        this.registerCommand(/purge (\d+)/g, (msg: Discord.Message, args: RegExpExecArray) => msg.channel.bulkDelete(+args[1] + 1));
         this.registerCommand(/(?:nick|setnick|changenick)\s+?(\w+)/g, (msg: Discord.Message, args: RegExpExecArray) => {
             msg.guild.members.get(this.client.user.id)!.setNickname(args[1]);
             msg.channel.send(`Nickname changed to '${args[1]}'`);

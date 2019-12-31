@@ -8,17 +8,6 @@ import { StatsProfile } from "./StatsProfile";
 export default class ApexTrackerService implements Service {
     initialize(bot: DefaultBot): void {
         bot.registerCommand(/apex\s+(\S+)\s+(.*)/g, async (msg: Message, args: RegExpExecArray) => {
-            /*if (isStringNullOrWhitespace(args)) {
-                msg.channel.send('Invalid username');
-                return;
-            }*/
-
-            /*const splitArgs = args[1].split(' ');
-            if (splitArgs.length < 2) {
-                msg.channel.send(`Proper syntax: ${bot.configFile.commandPrefix}apex <origin/xbl/psn> <player name>`);
-                return;
-            }*/
-
             const platform = args[1];
             const username = args[2];
             const headers = {

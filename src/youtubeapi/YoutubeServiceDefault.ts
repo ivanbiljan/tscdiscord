@@ -73,13 +73,8 @@ export default class YoutubeServiceDefault implements Service {
         });
 
         bot.registerCommand(/musicchannel (\d+)/g, (msg: Message, args: RegExpExecArray) => {
-            if (!+args) {
-                msg.channel.send('Invalid arguments');
-                return;
-            }
-
             bot.configFile.musicVoiceChannel = args[1];
-            msg.channel.send(`Voice channel set to #${args}`);
+            msg.channel.send(`Voice channel set to #${args[1]}`);
         });
     }
 
