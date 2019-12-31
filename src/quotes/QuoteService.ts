@@ -28,30 +28,20 @@ export default class QuoteService implements Service {
             msg.channel.send(`Saved quote #${this.quotes.length}`);
         });
 
-        /*bot.registerCommand('readquote', (msg: Message, args: string) => {
-            if (!args || !(+args && +args <= this.quotes.length)) {
-                msg.channel.send('Invalid quote id');
-                return;
-            }
-
-            const quote = this.quotes[+args - 1];
+        bot.registerCommand(/quote read (\d+)/g, (msg: Message, args: RegExpExecArray) => {
+            const quote = this.quotes[(+args[1] - 1) % this.quotes.length];
             msg.channel.send(`Quote #${quote.id}: ${quote.content} - Added by ${quote.author}`);
         });
 
-        bot.registerCommand('delquote', (msg: Message, args: string) => {
-            if (!args || !(+args && +args <= this.quotes.length)) {
-                msg.channel.send('Invalid quote id');
-                return;
-            }
-
-            const quote = this.quotes[+args - 1];
+        bot.registerCommand(/quote (?:del|delete) (\d+)/g, (msg: Message, args: RegExpExecArray) => {
+            const quote = this.quotes[(+args[1] - 1) % this.quotes.length];
             this.quotes.splice(this.quotes.indexOf(quote), 1);
             msg.channel.send(`Deleted quote #${+args}`);
         });
 
-        bot.registerCommand('randomquote', (msg: Message) => {
+        bot.registerCommand(/quote random/g, (msg: Message) => {
             const quote = this.quotes[random(0, this.quotes.length - 1)];
             msg.channel.send(`Quote #${quote.id}: ${quote.content} - Added by ${quote.author}`);
-        });*/
+        });
     }
 }
