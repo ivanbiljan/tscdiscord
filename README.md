@@ -4,14 +4,15 @@
 [tscdiscord](https://github.com/ivanbiljan/tscdiscord) is a multi-purpose Discord chat bot built on top of the [discord.js](https://github.com/discordjs/discord.js) framework using TypeScript.
 
 ## Features
-* Quote system
+* Regex based command matching
+* Quotes
 * Instagram service
 * YouTube API which allows playing music via Discord voice chat (does not require a Google API key)
 * Forecasts (current, weekly)
 * Game tracking (CSGO, Fortnite, Apex)
 * Google search (TODO)
 * Google image scraping (TODO)
-* Reminders (TODO)
+* Reminders 
 * Highlights (TODO)
 
 ## Prerequisites
