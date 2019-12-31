@@ -29,7 +29,7 @@ export default class YoutubeServiceDefault implements Service {
     private readonly musicQueue = new MusicQueue();
 
     initialize(bot: DefaultBot) {
-        bot.registerCommand('play', async (msg: Message, args: string) => {
+        bot.registerCommand(/play (.*)/g, async (msg: Message, args: RegExpExecArray) => {
             if (!bot.configFile.canPlayMusic) {
                 msg.channel.send('Music has been disabled');
                 return;
@@ -50,7 +50,7 @@ export default class YoutubeServiceDefault implements Service {
                 return;
             }
 
-            const video = await this.getVideoByName(args);
+            const video = await this.getVideoByName(args[1]);
             if (video == undefined) {
                 msg.channel.send(`No results found for query '${args}'`);
                 return;
@@ -72,13 +72,13 @@ export default class YoutubeServiceDefault implements Service {
             this.playNextSong(msg);
         });
 
-        bot.registerCommand('musicchannel', (msg: Message, args: string) => {
+        bot.registerCommand(/musicchannel (\d+)/g, (msg: Message, args: RegExpExecArray) => {
             if (!+args) {
                 msg.channel.send('Invalid arguments');
                 return;
             }
 
-            bot.configFile.musicVoiceChannel = args;
+            bot.configFile.musicVoiceChannel = args[1];
             msg.channel.send(`Voice channel set to #${args}`);
         });
     }

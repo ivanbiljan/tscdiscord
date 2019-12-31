@@ -14,16 +14,16 @@ import { writeFileSync } from "fs";
 
 export default class GoogleService implements Service {
     initialize(bot: import("../framework/DiscordBot").DefaultBot): void {
-        bot.registerCommand('weather', async (msg: Message, args: string) => {
+        bot.registerCommand(/weather\s+?(.*)/g, async (msg: Message, args: RegExpExecArray) => {
             const validOptions = ["zip", "id"];
-            if (isStringNullOrWhitespace(args)) {
+            /*if (isStringNullOrWhitespace(args)) {
                 msg.channel.send('Invalid arguments');
                 return;
-            }
+            }*/
 
             // Do I really have to do this?
             // OpenWeatherMap seems to handle zip codes regardless of query parameters, although such responses are not 100% accurate (e.g 10370,HR returns 'Zagreb')
-            const splitArgs = args.split(' ');
+            const splitArgs = args[1].split(' ');
             let param = splitArgs.find(arg => validOptions.includes(arg));
             let endpoint = 'https://api.openweathermap.org/data/2.5/weather?';
             switch (param) {
@@ -61,13 +61,13 @@ export default class GoogleService implements Service {
             });
         });
 
-        bot.registerCommand('forecast', async (msg: Message, args: string) => {
-            if (isStringNullOrWhitespace(args)) {
+        bot.registerCommand(/forecast\s+?(.*)/g, async (msg: Message, args: RegExpExecArray) => {
+            /*if (isStringNullOrWhitespace(args)) {
                 msg.channel.send('Invalid arguments');
                 return;
-            }
+            }*/
 
-            const endpoint = `https://api.openweathermap.org/data/2.5/forecast?q=${args}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
+            const endpoint = `https://api.openweathermap.org/data/2.5/forecast?q=${args[1]}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
             await request.get(endpoint, (err, res) => {
                 if (err) {
                     console.log(`open weather map error: ${err}`);

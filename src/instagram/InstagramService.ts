@@ -7,18 +7,18 @@ import { random } from "../Utils";
 
 export default class InstagramService implements Service {
     initialize(bot: DefaultBot): void {
-        bot.registerCommand('gomazbomb', async (msg: Message, args: string) => {
+        bot.registerCommand('gomazbomb', async (msg: Message) => {
             const timelineMedia = (await this.fetchData('croatiart')).graphql.user.edge_owner_to_timeline_media;
             msg.channel.send(timelineMedia.edges[random(0, timelineMedia.edges.length - 1)].node.display_url);
         });
 
-        bot.registerCommand('insta', async (msg: Message, args: string) => {
-            if (!args || !/\S/g.test(args)) {
+        bot.registerCommand(/insta\s+(.*)/g, async (msg: Message, args: RegExpExecArray) => {
+            /*if (!args || !/\S/g.test(args)) {
                 msg.channel.send('Invalid arguments');
                 return;
-            }
+            }*/
 
-            const data = await this.fetchData(args);
+            const data = await this.fetchData(args[1]);
             const embed = new RichEmbed()
                 .setColor('0099ff')
                 .setAuthor('Overview', 'https://i.imgur.com/M6yBwxS.png?1')

@@ -7,6 +7,7 @@ import GoogleService from '../google/GoogleService';
 import redis = require('redis');
 import QuoteService from '../quotes/QuoteService';
 import ApexTrackerService from '../gametrackers/apex/ApexTrackerService';
+import { Command } from './Command';
 
 // TODO: Come up with a proper service detection mechanism
 //       Regex matching for commands
@@ -33,7 +34,7 @@ export class DefaultBot implements DiscordBot {
         new ApexTrackerService()
     ];
 
-    private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
+    /*private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
         ['ping']: (msg: Discord.Message) => msg.channel.send('ponGG'),
         ['nick']: (msg: Discord.Message) => {
             let nick = msg.content.substring(msg.content.indexOf(' ') + 1);
@@ -48,7 +49,9 @@ export class DefaultBot implements DiscordBot {
 
             msg.channel.bulkDelete(numberOfMessages + 1);
         }
-    };
+        [/\S/g.toString()]: 
+    };*/
+    private commands: Command[] = [];
 
     client: Discord.Client = new Discord.Client();
     configFile: ConfigurationFile;
@@ -66,7 +69,29 @@ export class DefaultBot implements DiscordBot {
         });
 
         this.client.on('message', msg => {
-            let commandName = '';
+            let message = ''; // This will be the section that we match against
+            if (msg.content.startsWith(this.configFile.commandPrefix)) {
+                message = msg.content.slice(1);
+            } else {
+                const commandRegex = /(\S+)\s*(.*)/g.exec(msg.content);
+                if (!commandRegex) {
+                    return;
+                }
+
+                if (!this.configFile.aliases.includes(commandRegex[1])) {
+                    return;
+                }
+
+                message = commandRegex[2];
+            }
+
+            for (let i = 0; i < this.commands.length; ++i) {
+                const match = this.commands[i].matchRegex.exec(message);
+                if (match) {
+                    this.commands[i].callback(msg, match);
+                }
+            }
+            /*let commandName = '';
             let indexOfSpace = msg.content.indexOf(' ');
             if (msg.content.startsWith(this.configFile.commandPrefix)) {
                 if (indexOfSpace == -1) {
@@ -89,7 +114,7 @@ export class DefaultBot implements DiscordBot {
             const callback = this.commands[commandName];
             if (callback) {
                 callback(msg, msg.content.slice(indexOfSpace).trim());
-            }
+            }*/
         });
 
         this.redisclient = redis.createClient(this.redisOptions).on('connect', () => {
@@ -97,10 +122,17 @@ export class DefaultBot implements DiscordBot {
                 service.initialize(this);
             });
         });
+
+        this.registerCommand('ping', (msg: Discord.Message) => msg.channel.send('ponGG'));
+        this.registerCommand(/(?:nick|setnick|changenick)\s+?(\w+)/g, (msg: Discord.Message, args: RegExpExecArray) => {
+            msg.guild.members.get(this.client.user.id)!.setNickname(args[1]);
+            msg.channel.send(`Nickname changed to '${args[1]}'`);
+        });
     }
 
-    registerCommand(commandName: string, callback: (msg: Discord.Message, args: string) => void): void {
-        this.commands[commandName] = callback;
+    registerCommand(regex: string | RegExp, callback: (msg: Discord.Message, match: RegExpExecArray) => void, helpText?: string): void {
+        const commandRegex = typeof regex === 'string' ? new RegExp(regex) : regex;
+        this.commands.push({matchRegex: commandRegex, callback: callback, helpText: helpText});
     }
 
     redisSave(key: string, value: any): void {

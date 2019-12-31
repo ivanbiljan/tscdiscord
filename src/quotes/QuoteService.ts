@@ -16,19 +16,19 @@ export default class QuoteService implements Service {
             bot.redisSave('quotes', this.quotes);
         }
 
-        bot.registerCommand('addquote', (msg: Message, args: string) => {
-            if (isStringNullOrWhitespace(args)) {
+        bot.registerCommand(/quote add (.*)/g, (msg: Message, args: RegExpExecArray) => {
+            /*if (isStringNullOrWhitespace(args)) {
                 msg.channel.send('Invalid quote');
                 return;
-            }
+            }*/
 
-            const quote: Quote = {id: this.quotes.length + 1, content: args, author: msg.member.user.username};
+            const quote: Quote = {id: this.quotes.length + 1, content: args[1], author: msg.member.user.username};
             this.quotes.push(quote);
             bot.redisSave('quotes', this.quotes);
             msg.channel.send(`Saved quote #${this.quotes.length}`);
         });
 
-        bot.registerCommand('readquote', (msg: Message, args: string) => {
+        /*bot.registerCommand('readquote', (msg: Message, args: string) => {
             if (!args || !(+args && +args <= this.quotes.length)) {
                 msg.channel.send('Invalid quote id');
                 return;
@@ -52,6 +52,6 @@ export default class QuoteService implements Service {
         bot.registerCommand('randomquote', (msg: Message) => {
             const quote = this.quotes[random(0, this.quotes.length - 1)];
             msg.channel.send(`Quote #${quote.id}: ${quote.content} - Added by ${quote.author}`);
-        });
+        });*/
     }
 }
