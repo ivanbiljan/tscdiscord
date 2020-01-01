@@ -9,12 +9,11 @@ export default class QuoteService implements Service {
     initialize(bot: import("../framework/DiscordBot").DefaultBot): void {
         bot.redisLoad<Quote[]>('quotes', (err, res) => {
             this.quotes = res;
+            if (!this.quotes) {
+                this.quotes = [];
+                bot.redisSave('quotes', this.quotes);
+            }
         });
-
-        if (!this.quotes) {
-            this.quotes = [];
-            bot.redisSave('quotes', this.quotes);
-        }
 
         bot.registerCommand(/quote add (.*)/g, (msg: Message, args: RegExpExecArray) => {
             const quote: Quote = {id: this.quotes.length + 1, content: args[1], author: msg.member.user.username};
