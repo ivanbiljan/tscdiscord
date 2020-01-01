@@ -21,8 +21,9 @@ export interface DiscordBot {
 
 export class DefaultBot implements DiscordBot {
     private redisOptions: redis.ClientOpts = {
-        host: '127.0.0.1',
-        port: 6379
+        host: process.env.REDIS_HOST || '127.0.0.1',
+        port: process.env.REDIS_PORT ? +process.env.REDIS_PORT : 6739,
+        auth_pass: process.env.REDIS_PASS || ''
     };
     
     private redisclient: redis.RedisClient | undefined;
@@ -103,7 +104,6 @@ export class DefaultBot implements DiscordBot {
         }
 
         this.redisclient.set(key, JSON.stringify(value));
-        this.redisclient.save();
     }
 
     redisLoad<T>(key: string, callback: (err: Error | null, val: T) => any): void {
