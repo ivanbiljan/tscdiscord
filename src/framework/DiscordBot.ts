@@ -36,22 +36,6 @@ export class DefaultBot implements DiscordBot {
         new ReminderService()
     ];
 
-    /*private commands: { [cmd: string]: (msg: Discord.Message, args: string) => any } = {
-        ['ping']: (msg: Discord.Message) => msg.channel.send('ponGG'),
-        ['nick']: (msg: Discord.Message) => {
-            let nick = msg.content.substring(msg.content.indexOf(' ') + 1);
-            msg.guild.members.get(this.client.user.id)!.setNickname(nick);
-        },
-        ['purge']: (msg: Discord.Message, args: string) => {
-            let numberOfMessages = +args
-            if (!numberOfMessages) {
-                msg.channel.send('Invalid number specified');
-                return;
-            }
-
-            msg.channel.bulkDelete(numberOfMessages + 1);
-        }
-    };*/
     private commands: Command[] = [];
 
     client: Discord.Client = new Discord.Client();
