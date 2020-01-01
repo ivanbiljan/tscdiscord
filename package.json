@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A TypeScript Discord bot",
   "main": "index.js",
+  "engines": {
+    "node": "13.2.0"
+  },
   "scripts": {
     "build": "tsc",
     "app": "node dist/main.js",
