@@ -11,8 +11,7 @@ serivces:
   - redis-server
 
 before_script:
-  - npm install -g typescript
   - npm install
 
 script:
-  - npm run build
+  - npm run tsc
