@@ -16,7 +16,7 @@ export default class ReminderService implements Service {
             }
         });
 
-        setTimeout(() => this.remind(bot), 30000);
+        setTimeout(() => this.remind(bot), 1 * 60 * 1000);
 
         bot.registerCommand(/remind\s+?(?:me)?\s+?to\s*(.*?)\s+?in\s+?(\d+)\s*?(m|h)/g, (msg: Message, args: RegExpExecArray) => {
             const reminder = args[1];
