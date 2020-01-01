@@ -48,7 +48,7 @@ export class DefaultBot implements DiscordBot {
     }
 
     connect(): void {
-        this.client.login(this.configFile.token);
+        this.client.login(process.env.DISCORD_TOKEN);
         this.client.on('ready', () => {
             console.log("> CHeeRs FRoM CROatTia");
         });

@@ -25,14 +25,14 @@ export default class GoogleService implements Service {
             switch (param) {
                 case 'zip':
                     splitArgs.splice(splitArgs.indexOf(param), 1).join('')
-                    endpoint += `zip=${splitArgs.join(' ')}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
+                    endpoint += `zip=${splitArgs.join(' ')}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
                     break;
                 case 'id':
                     splitArgs.splice(splitArgs.indexOf(param), 1).join('')
-                    endpoint += `id=${splitArgs.join(' ')}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
+                    endpoint += `id=${splitArgs.join(' ')}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
                     break;
                 default:
-                    endpoint += `q=${args}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
+                    endpoint += `q=${args}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
                     break;
             }
 
@@ -58,7 +58,7 @@ export default class GoogleService implements Service {
         });
 
         bot.registerCommand(/forecast\s+?(.*)/g, async (msg: Message, args: RegExpExecArray) => {
-            const endpoint = `https://api.openweathermap.org/data/2.5/forecast?q=${args[1]}&units=metric&APPID=${bot.configFile.openWeatherMapApiKey}`;
+            const endpoint = `https://api.openweathermap.org/data/2.5/forecast?q=${args[1]}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
             await request.get(endpoint, (err, res) => {
                 if (err) {
                     console.log(`open weather map error: ${err}`);

@@ -7,9 +7,9 @@
     "node": "13.2.0"
   },
   "scripts": {
-    "build": "tsc",
-    "app": "node dist/main.js",
-    "debug": "tsc && node dist/main.js"
+    "tsc": "tsc",
+    "start": "node dist/main.js",
+    "postinstall": "npm run tsc"
   },
   "author": "Ivan Biljan",
   "license": "ISC",

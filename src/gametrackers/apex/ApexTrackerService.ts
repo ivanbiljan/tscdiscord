@@ -11,7 +11,7 @@ export default class ApexTrackerService implements Service {
             const platform = args[1];
             const username = args[2];
             const headers = {
-                'TRN-Api-Key': bot.configFile.trackerggApiKey,
+                'TRN-Api-Key': process.env.TRACKERGG_KEY,
                 'Accept': 'application/json'
             }
 

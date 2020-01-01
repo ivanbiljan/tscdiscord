@@ -17,11 +17,6 @@ export default class QuoteService implements Service {
         }
 
         bot.registerCommand(/quote add (.*)/g, (msg: Message, args: RegExpExecArray) => {
-            /*if (isStringNullOrWhitespace(args)) {
-                msg.channel.send('Invalid quote');
-                return;
-            }*/
-
             const quote: Quote = {id: this.quotes.length + 1, content: args[1], author: msg.member.user.username};
             this.quotes.push(quote);
             bot.redisSave('quotes', this.quotes);

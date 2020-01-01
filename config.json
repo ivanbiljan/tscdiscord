@@ -1,8 +1,4 @@
 {
-    "token": "NjUwNzE5NjM4ODQ1NjUzMDEy.XgUDOg.RMn1JpZlpgyhS0TVjCauIy8nybM",
-    "trackerggApiKey": "38bc5164-9c77-4059-9ded-2174a5b431f0",
-    "openWeatherMapApiKey": "7952f2183e028987175e29da5fc93e4c",
-    "serpApiKey": "",
     "commandPrefix": "!",
     "canPlayMusic": true,
     "musicVoiceChannel": "",
