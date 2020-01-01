@@ -57,6 +57,7 @@ export default class ReminderService implements Service {
             this.reminders.splice(usedReminders[i], 1);
         }
 
+        bot.redisSave('reminders', this.reminders);
         setTimeout(() => this.remind(bot), 30000);
     }
 }
