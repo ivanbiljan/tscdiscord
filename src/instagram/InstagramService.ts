@@ -10,9 +10,9 @@ export default class InstagramService implements Service {
         bot.registerCommand('gomazbomb', async (msg: Message) => {
             const timelineMedia = (await this.fetchData('croatiart')).graphql.user.edge_owner_to_timeline_media;
             msg.channel.send(timelineMedia.edges[random(0, timelineMedia.edges.length - 1)].node.display_url);
-        });
+        }, 'gomazbomb');
 
-        bot.registerCommand(/insta\s+(.*)/g, async (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/insta\s+(.*)/, async (msg: Message, args: RegExpExecArray) => {
             /*if (!args || !/\S/g.test(args)) {
                 msg.channel.send('Invalid arguments');
                 return;
@@ -33,7 +33,7 @@ export default class InstagramService implements Service {
                 .setFooter('BUFF YOAD', 'https://vignette.wikia.nocookie.net/old-people-facebook/images/1/1e/W0r1w6813td01.jpg/revision/latest?cb=20190821173248')
                 .setTimestamp();
             msg.channel.send(embed);
-        });
+        }, 'insta <username> - Returns Instagram overview for the specified user');
     }
 
     public async fetchData(profile: string): Promise<ResponseData.ResponseJson> {

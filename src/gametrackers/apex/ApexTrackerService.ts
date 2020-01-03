@@ -44,6 +44,6 @@ export default class ApexTrackerService implements Service {
                 const errorMessage = JSON.parse(reason.error).errors[0].message;
                 msg.channel.send(`API Error: ${errorMessage}`);
             });
-        });
+        }, 'apex <username> - Returns Apex Legends statistics for the specified user');
     }
 }

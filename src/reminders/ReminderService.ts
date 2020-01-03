@@ -18,7 +18,7 @@ export default class ReminderService implements Service {
 
         setTimeout(() => this.remind(bot), 1 * 60 * 1000);
 
-        bot.registerCommand(/remind\s+?(?:me)?\s+?to\s*(.*?)\s+?in\s+?(\d+)\s*?(m|h)/g, (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/remind\s+?(?:me)?\s+?to\s*(.*?)\s+?in\s+?(\d+)\s*?(m|h)/, (msg: Message, args: RegExpExecArray) => {
             const reminder = args[1];
             const time = +args[2];
             const hourOrMinutes = args[3];
@@ -36,7 +36,7 @@ export default class ReminderService implements Service {
             this.reminders.push({userId: msg.member.user.id, reminder: reminder, timeOfNotice: date});
             bot.redisSave('reminders', this.reminders);
             msg.channel.send(`Reminder set for '${date.toUTCString()}'`);
-        });
+        }, 'remind me to <reminder> in <number>m/h - Sets a reminder');
     }
 
     private async remind(bot: DefaultBot): Promise<void> {

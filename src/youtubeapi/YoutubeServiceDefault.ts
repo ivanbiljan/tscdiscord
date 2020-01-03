@@ -13,6 +13,7 @@ import { AdaptiveStream } from './AdaptiveStream';
 import { sign } from 'crypto';
 import { url } from 'inspector';
 import { ClientRequestArgs } from 'http';
+import { brotliCompress } from 'zlib';
 const parser = require('partial-json-parser');
 const BeautifulDom = require('beautiful-dom');
 const ytdlcore = require('ytdl-core');
@@ -65,17 +66,42 @@ export default class YoutubeServiceDefault implements Service {
                 this.musicQueue.songs.push(video);
                 msg.channel.send(`'${video.title}' has been added to the song queue`);
             }
-        });
+        }, 'play <name or link> - Adds the specified song the music queue');
 
         bot.registerCommand('skip', (msg: Message) => {
+            if (!this.musicQueue.connection) {
+                msg.channel.send('I\'m not playing music');
+                return;
+            }
+
             msg.channel.send('Skipping current song...');
             this.playNextSong(msg);
-        });
+        }, 'skip - Skips the current song');
+
+        bot.registerCommand('pause', (msg: Message) => {
+            if (!this.musicQueue.connection) {
+                msg.channel.send('I\'m not playing music');
+                return;
+            }
+
+            this.musicQueue.connection.dispatcher.pause();
+            msg.channel.send('Paused ongoing stream');
+        }, 'pause - Pauses music');
+
+        bot.registerCommand(/(?:start|resume)/, (msg: Message) => {
+            if (!this.musicQueue.connection) {
+                msg.channel.send('I\'m not playing music');
+                return;
+            }
+
+            this.musicQueue.connection.dispatcher.resume();
+            msg.channel.send('Resumed paused stream');
+        }, 'resume - Resumes music');
 
         bot.registerCommand(/musicchannel (\d+)/g, (msg: Message, args: RegExpExecArray) => {
             bot.configFile.musicVoiceChannel = args[1];
             msg.channel.send(`Voice channel set to #${args[1]}`);
-        });
+        }, 'musicchannel <channel id> - Sets the music channel');
     }
 
     private playNextSong(msg: Message): void {

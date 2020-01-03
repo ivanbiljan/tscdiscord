@@ -22,7 +22,7 @@ export interface DiscordBot {
 export class DefaultBot implements DiscordBot {
     private redisOptions: redis.ClientOpts = {
         host: process.env.REDIS_HOST || '127.0.0.1',
-        port: process.env.REDIS_PORT ? +process.env.REDIS_PORT : 6739,
+        port: +(process.env.REDIS_PORT || 6379),
         auth_pass: process.env.REDIS_PASS || ''
     };
     
@@ -55,6 +55,10 @@ export class DefaultBot implements DiscordBot {
         });
 
         this.client.on('message', msg => {
+            if (msg.member.user?.id == this.client.user.id) {
+                return;
+            }
+
             let message = ''; // This will be the section that we match against
             if (msg.content.startsWith(this.configFile.commandPrefix)) {
                 message = msg.content.slice(1);
@@ -85,12 +89,23 @@ export class DefaultBot implements DiscordBot {
             });
         });
 
-        this.registerCommand('ping', (msg: Discord.Message) => msg.channel.send('ponGG'));
-        this.registerCommand(/purge (\d+)/g, (msg: Discord.Message, args: RegExpExecArray) => msg.channel.bulkDelete(+args[1] + 1));
-        this.registerCommand(/(?:nick|setnick|changenick)\s+?(\w+)/g, (msg: Discord.Message, args: RegExpExecArray) => {
+        this.registerCommand('ping', (msg: Discord.Message) => msg.channel.send('ponGG'), 'ping - Pings the bot');
+        this.registerCommand(/purge (\d+)/, (msg: Discord.Message, args: RegExpExecArray) => msg.channel.bulkDelete(+args[1] + 1), 'purge <number> - Removes a specified number of messages');
+        this.registerCommand(/(?:nick|setnick|changenick)\s+?(\w+)/, (msg: Discord.Message, args: RegExpExecArray) => {
             msg.guild.members.get(this.client.user.id)!.setNickname(args[1]);
             msg.channel.send(`Nickname changed to '${args[1]}'`);
-        });
+        }, 'nick <nickname> - Sets the bot\'s nickname');
+        this.registerCommand('help', (msg: Discord.Message) => {
+            let outputString = '**Available commands**:\n';
+            for (let i = 0; i < this.commands.length; ++i) {
+                const command = this.commands[i];
+                if (command.helpText) {
+                    outputString += command.helpText + '\n';
+                }
+            }
+
+            msg.channel.send(outputString);
+        }, 'help - Lists available commands');
     }
 
     registerCommand(regex: string | RegExp, callback: (msg: Discord.Message, match: RegExpExecArray) => void, helpText?: string): void {
@@ -104,16 +119,18 @@ export class DefaultBot implements DiscordBot {
         }
 
         this.redisclient.set(key, JSON.stringify(value));
+        //this.redisclient.save(); --> Uncomment to persist data to disk
     }
 
     redisLoad<T>(key: string, callback: (err: Error | null, val: T) => any): void {
-        if (this.redisclient == undefined || !this.redisclient.connected) {
+        if (!this.redisclient || !this.redisclient.connected) {
             return undefined;
         }
 
         this.redisclient.get(key, (err, val) => {
             if (err) {
                 console.log(`redis: ${err}`);
+                return;
             }
 
             return callback(err, JSON.parse(val));
