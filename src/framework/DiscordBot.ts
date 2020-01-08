@@ -9,6 +9,8 @@ import QuoteService from '../quotes/QuoteService';
 import ApexTrackerService from '../gametrackers/apex/ApexTrackerService';
 import { Command } from './Command';
 import ReminderService from '../reminders/ReminderService';
+import { traverseDirectory } from '../Utils';
+import { load } from 'dotenv/types';
 
 // TODO: Come up with a proper service detection mechanism
 //       Regex matching for commands
@@ -27,16 +29,6 @@ export class DefaultBot implements DiscordBot {
     };
     
     private redisclient: redis.RedisClient | undefined;
-
-    private services: Service[] = [
-        new YoutubeServiceDefault(),
-        new InstagramService(),
-        new GoogleService(),
-        new QuoteService(),
-        new ApexTrackerService(),
-        new ReminderService()
-    ];
-
     private commands: Command[] = [];
 
     client: Discord.Client = new Discord.Client();
@@ -45,7 +37,22 @@ export class DefaultBot implements DiscordBot {
 
     constructor(configFile: ConfigurationFile, services?: Service[]) {
         this.configFile = configFile;
-        this.loadedServices = services || this.services;
+        if (services) {
+            this.loadedServices = services;
+        } else {
+            const files = traverseDirectory('./dist').filter(file => file.endsWith('.js'));
+            for (const file of files) {
+                const module = require(file);
+                if (!module || !module.default) { // No export
+                    continue;
+                }
+
+                if ('initialize' in module.default.prototype) { // Should've opted for an abstract class instead?
+                    console.log(`Loading file '${file}'`);
+                    this.loadedServices.push(new module.default());
+                }
+            }
+        }
     }
 
     connect(): void {
