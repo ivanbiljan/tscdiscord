@@ -1,20 +1,13 @@
 import { Service } from "../framework/Service";
 import { Message } from "discord.js";
 import * as request from 'request-promise-native';
-import { random, isStringNullOrWhitespace } from "../Utils";
-import BeautifulDom from "beautiful-dom";
+import * as cheerio from 'cheerio';
 import { writeFileSync } from "fs";
-
-// TODO: Google Search
-//       Timezones
-//       Weather -- Done
-//       Images
-
-// I'll have to scrape Google manually
+import { random } from "../Utils";
 
 export default class GoogleService implements Service {
     initialize(bot: import("../framework/DiscordBot").DefaultBot): void {
-        bot.registerCommand(/weather\s+?(.*)/g, async (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/weather\s+?(.*)/, async (msg: Message, args: RegExpExecArray) => {
             const validOptions = ["zip", "id"];
             
             // Do I really have to do this?
@@ -32,7 +25,7 @@ export default class GoogleService implements Service {
                     endpoint += `id=${splitArgs.join(' ')}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
                     break;
                 default:
-                    endpoint += `q=${args}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
+                    endpoint += `q=${args[1]}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
                     break;
             }
 
@@ -57,7 +50,7 @@ export default class GoogleService implements Service {
             });
         });
 
-        bot.registerCommand(/forecast\s+?(.*)/g, async (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/forecast\s+?(.*)/, async (msg: Message, args: RegExpExecArray) => {
             const endpoint = `https://api.openweathermap.org/data/2.5/forecast?q=${args[1]}&units=metric&APPID=${process.env.OPENWEATHERMAP_KEY}`;
             await request.get(endpoint, (err, res) => {
                 if (err) {
@@ -96,5 +89,88 @@ export default class GoogleService implements Service {
                 msg.channel.send(`API Error: ${errorMessage}`);
             });
         });
+
+        bot.registerCommand(/(?:image|img)\s+(?:me)?\s+(.+)/, async (msg, args) => {
+            const url = `https://www.google.co.in/search?q=${args[1]}&source=lnms&tbm=isch`;
+            const headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36'
+            };
+
+            await request.get(url, {headers: headers, resolveWithFullResponse: true}, (err, res) => {
+                if (err) {
+                    console.log(`open weather map error: ${err}`);
+                    return;
+                }
+
+                if (!(res.statusCode >= 200 && res.statusCode <= 299)) {
+                    console.log(`open weather map: unsuccessful response (${res.statusCode})`);
+                    return;
+                }
+
+                const $ = cheerio.load(res.body);
+                const rgMeta = $('.rg_meta')[random(1, 10)];
+                const child = rgMeta.children[0];
+                if (child && child.data) {
+                    msg.channel.send(JSON.parse(child.data).ou);
+                } else {
+                    msg.channel.send(`No results found for '${args[1]}'`);
+                }
+            }).catch(() => console.log('Google Image: unhandled exception'));
+        }, 'image me <query> - Returns a random image for the given search query');
+
+        bot.registerCommand(/google\s+(?:me)?\s+(.+)/, async (msg, args) => {
+            const url = `https://www.google.co.in/search?q=${args[1]}`;
+            const headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36'
+            };
+
+            await request.get(url, {headers: headers, resolveWithFullResponse: true}, (err, res) => {
+                if (err) {
+                    console.log(`open weather map error: ${err}`);
+                    return;
+                }
+
+                if (!(res.statusCode >= 200 && res.statusCode <= 299)) {
+                    console.log(`open weather map: unsuccessful response (${res.statusCode})`);
+                    return;
+                }
+
+                const $ = cheerio.load(res.body);
+                const result = $('.r > a').attr('href');
+                msg.channel.send(result);
+            }).catch(() => console.log('Google Search: unhandled exception'));
+        }, 'google me <query> - Returns a the first result for the given search query');
+
+        bot.registerCommand(/(?:fml|fmylife)/, async (msg) => {
+            const url = 'https://www.fmylife.com/'
+            const headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.134 Safari/537.36'
+            };
+
+            await request.get(url, {headers: headers}, (err, res) => {
+                if (err) {
+                    console.log(`open weather map error: ${err}`);
+                    return;
+                }
+
+                if (!(res.statusCode >= 200 && res.statusCode <= 299)) {
+                    console.log(`open weather map: unsuccessful response (${res.statusCode})`);
+                    return;
+                }
+
+                const $ = cheerio.load(res.body);
+                const post = $('.article-link').toArray()[random(1, 20)];
+                if (post) {
+                    msg.channel.send(`**__${post.children[1].children[0].data}__**${post.children[2].data}`);
+                }
+            }).catch(() => console.log('fml: unhandled exception'));
+        }, 'fml - Returns a random post from fmylife.com');
+
+        bot.registerCommand(/(?:fact|random\s*fact)/, async (msg) => {
+            await request.get('https://uselessfacts.jsph.pl/random.json?language=en', (err, res) => {
+                const response = JSON.parse(res.body);
+                msg.channel.send(response.text);
+            }).catch(() => console.log('useslessfacts: unhandled exception'));
+        }, 'fact - Returns a random fact');
     }
 }

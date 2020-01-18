@@ -21,7 +21,7 @@ export default class YoutubeServiceDefault implements Service {
     private readonly musicQueue = new MusicQueue();
 
     initialize(bot: DefaultBot) {
-        bot.registerCommand(/play (.*)/g, async (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/play (.*)/, async (msg: Message, args: RegExpExecArray) => {
             if (!bot.configFile.canPlayMusic) {
                 msg.channel.send('Music has been disabled');
                 return;
@@ -89,7 +89,7 @@ export default class YoutubeServiceDefault implements Service {
             msg.channel.send('Resumed paused stream');
         }, 'resume - Resumes music');
 
-        bot.registerCommand(/musicchannel (\d+)/g, (msg: Message, args: RegExpExecArray) => {
+        bot.registerCommand(/musicchannel (\d+)/, (msg: Message, args: RegExpExecArray) => {
             bot.configFile.musicVoiceChannel = args[1];
             msg.channel.send(`Voice channel set to #${args[1]}`);
         }, 'musicchannel <channel id> - Sets the music channel');

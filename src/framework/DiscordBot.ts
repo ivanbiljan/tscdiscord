@@ -12,9 +12,6 @@ import ReminderService from '../reminders/ReminderService';
 import { traverseDirectory } from '../Utils';
 import { load } from 'dotenv/types';
 
-// TODO: Come up with a proper service detection mechanism
-//       Regex matching for commands
-
 export interface DiscordBot {
     client: Discord.Client;
     configFile: ConfigurationFile;
