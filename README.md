@@ -45,12 +45,21 @@
     sudo apt-get install redis-server
     ```
 ## Discord setup
-Register a new bot at https://discordapp.com/developers. Once done, open `My Application` -> `Bot`, get the bot's token and paste it into `config.json`.
+Register a new bot at https://discordapp.com/developers. Once done, open `My Application` -> `Bot`, get the bot's token and paste it into a `.env`.
 
 Open `My Application` -> `General Information`. Copy the bot's client ID and paste it into the following URL: https://discordapp.com/api/oauth2/authorize?client_id=[CLIENT_ID]&scope=bot&permissions=[PERMISSIONS]
 
 ## Run the application
-Run `npm install` followed by `npm run build` and `npm run app`
+```shell
+# Install dependencies
+npm install
+
+# Build the project
+npm run tsc
+
+# Run the app
+npm start
+```
 
 ## License
 This project is distributed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License), see [LICENSE](https://github.com/ivanbiljan/tscdiscord/blob/master/LICENSE) for more details.
