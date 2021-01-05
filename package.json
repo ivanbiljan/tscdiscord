@@ -20,7 +20,7 @@
     "@types/redis": "^2.8.14",
     "@types/request": "^2.48.4",
     "@types/request-promise-native": "^1.0.17",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "beautiful-dom": "^1.0.7",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^11.5.1",
